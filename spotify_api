@@ -1,0 +1,107 @@
+import pandas as pd
+import datetime
+import requests
+
+pd.set_option("display.max_rows", 50, "display.max_columns", None)
+
+
+def sep(sep,time):
+    print(sep*time)
+
+
+def convert(n):
+    return str(datetime.timedelta(seconds=n))
+
+
+file0 = pd.read_json("MySpotifyData\StreamingHistory0.json")
+file1 = pd.read_json("MySpotifyData\StreamingHistory1.json")
+file2 = pd.read_json("MySpotifyData\StreamingHistory2.json")
+
+file = file0.append([file1, file2])
+
+file['clean duration'] = pd.to_datetime(file['msPlayed'], unit='ms')
+print(file.shape)
+print("*"*50)
+
+print(file)
+
+sep("*", 100)
+# doc
+# https://stmorse.github.io/journal/spotify-api.html
+# https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
+
+client_id = 'blabla'
+client_secret = 'blabla'
+
+
+def get_token():
+    CLIENT_ID = client_id
+    CLIENT_SECRET = client_secret
+
+    AUTH_URL = 'https://accounts.spotify.com/api/token'
+
+    # POST
+    auth_response = requests.post(AUTH_URL, {
+        'grant_type': 'client_credentials',
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+    })
+
+    # convert the response to JSON
+    auth_response_data = auth_response.json()
+
+    # save the access token
+    access_token = auth_response_data['access_token']
+    print(access_token)
+    return access_token
+
+
+token = get_token()
+
+# token for header
+headers = {
+    'Authorization': 'Bearer {token}'.format(token=token)
+}
+
+
+def search_artist_id(artist):
+    search_endpoint = 'https://api.spotify.com/v1/search'
+    params = {'q': 'metallica', 'type': 'artist'}
+    search_data = requests.get(url=search_endpoint,
+                               params=params,
+                               headers=headers)
+    data = search_data.json()
+    print(data)
+    artist_name = data['artists']['items'][0]['name']
+    artist_id = data['artists']['items'][0]['id']
+    artist_genre = data['artists']['items'][0]['genres']
+    return artist_id
+
+
+def search_track_id(song, artist):
+    search_endpoint = "https://api.spotify.com/v1/search"
+    query = f'track:{song} artist:{artist}'  # no need to encode query !
+    params = {'q': query, 'type': 'track'}
+    search_id = requests.get(url=search_endpoint,
+                             params=params,
+                             headers=headers)
+    data = search_id.json()
+    return data['tracks']['items'][0]['id']
+
+
+def search_song_feature(song_id):
+    feature_endpoint = 'https://api.spotify.com/v1/audio-features/'
+    params = {'ids': song_id}
+    song_feature = requests.get(url=feature_endpoint,
+                                params=params,
+                                headers=headers)
+    print(song_feature.url)
+    data = song_feature.json()
+    return data
+
+
+trackid = search_track_id('one', 'metallica')
+print(trackid)
+sep("%", 100)
+feature = search_song_feature(search_track_id('one', 'metallica'))
+print(feature)
