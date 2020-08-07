@@ -240,7 +240,6 @@ def enrich_id_files():
             item.append('None')
             item.append('None')
             item.append('None')
-            item.append('None')
 
         # unmute following line for qa purpose
         #print(f"song : {item[1]}, artist : {item[0]}, id : {id}, features : {features}")
@@ -250,12 +249,11 @@ def enrich_id_files():
     print(meta_list)
 
     with open('meta_song_ids.csv', 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
         header = ['artistName', 'trackName', 'text_key', 'trackId', 'danceability',
                           'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
                           'instrumentalness', 'liveness', 'valence', 'tempo', 'type', 'duration_ms']
-        for head in header:
-            writer.writerows(head)
+        writer.writerow(header)
         writer.writerows(meta_list)
 
     return meta_list
@@ -266,6 +264,7 @@ enrich_id_files()
 # uploading new version of csv to gcs
 blob = bucket.blob('meta_song_ids.csv')
 blob.upload_from_filename('meta_song_ids.csv')
+print("file uploaded into Gcs")
 """
 
 print(type(file))
