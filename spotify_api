@@ -160,6 +160,9 @@ def search_song_feature(song_id):
                                 headers=headers)
     #print(song_feature.url)
     data = song_feature.json()
+    print(data)
+    if data == None:
+        data = 'None'
     return data
 
 # ------------testing values------------
@@ -188,26 +191,97 @@ def enrich_id_files():
     for item in meta_list:
         id = search_track_id(item[1], item[0])
         item.append(id)
-        features = search_song_feature(item[3])
-        item.append(features)
+        features = search_song_feature(item[3])  # --> extracting json from api
+        #print(features)
+
+        try:
+            # setting values
+            danceability = features['audio_features'][0]['danceability']
+            energy = features['audio_features'][0]['energy']
+            key = features['audio_features'][0]['key']
+            loudness = features['audio_features'][0]['loudness']
+            mode = features['audio_features'][0]['mode']
+            speechiness = features['audio_features'][0]['speechiness']
+            acousticness = features['audio_features'][0]['acousticness']
+            instrumentalness = features['audio_features'][0]['instrumentalness']
+            liveness = features['audio_features'][0]['liveness']
+            valence = features['audio_features'][0]['valence']
+            tempo = features['audio_features'][0]['tempo']
+            type = features['audio_features'][0]['type']
+            duration_ms = features['audio_features'][0]['duration_ms']
+
+            # adding values to the list
+            item.append(danceability)
+            item.append(energy)
+            item.append(key)
+            item.append(loudness)
+            item.append(mode)
+            item.append(speechiness)
+            item.append(acousticness)
+            item.append(instrumentalness)
+            item.append(liveness)
+            item.append(valence)
+            item.append(tempo)
+            item.append(type)
+            item.append(duration_ms)
+        except:
+            print('exception')
+            # adding values to the list
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+            item.append('None')
+
         # unmute following line for qa purpose
         #print(f"song : {item[1]}, artist : {item[0]}, id : {id}, features : {features}")
         counter += 1
-        print(f"{(counter / 5004)*100}% done")
+        print(f"{round((counter / 5004)*100, 4)}% done")
 
     print(meta_list)
 
     with open('meta_song_ids.csv', 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerows(['artistName', 'trackName', 'text_key', 'trackId', 'songFeatures'])
+        header = ['artistName', 'trackName', 'text_key', 'trackId', 'danceability',
+                          'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
+                          'instrumentalness', 'liveness', 'valence', 'tempo', 'type', 'duration_ms']
+        for head in header:
+            writer.writerows(head)
         writer.writerows(meta_list)
 
     return meta_list
 
-"""
+
 enrich_id_files()
 
 # uploading new version of csv to gcs
 blob = bucket.blob('meta_song_ids.csv')
 blob.upload_from_filename('meta_song_ids.csv')
+"""
+
+print(type(file))
+
+df = pd.read_csv('gs://bucket/your_path.csv')
+meta_data_df = pd.read_csv('gs://culture_data/meta_song_ids.csv')
+print(type(meta_data_df))
+
+
+blob = bucket.blob('meta_song_ids.csv')
+meta_data = json.loads(blob.download_as_string())
+print(type(meta_data))
+#meta_data_df = pd.DataFrame.(meta_data)
+
+# downloading data
+blob = bucket.blob('MySpotifyData/StreamingHistory0.json')
+data0 = json.loads(blob.download_as_string())
+file0 = pd.DataFrame.from_records(data0)
 """
