@@ -89,8 +89,8 @@ sep("*", 100)
 # https://stmorse.github.io/journal/spotify-api.html
 # https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
 
-client_id = 'b26ded131f254a078912a456774318fb'
-client_secret = '044b24a238d64e90bd4f560e76b9f6e8'
+client_id = '00000000000000000000000'
+client_secret = '00000000000000000000000'
 
 
 def get_token():
