@@ -61,6 +61,16 @@ file = file0.append([file1, file2])
 file['clean duration'] = pd.to_datetime(file['msPlayed'], unit='ms')
 file['text_key'] = file['artistName']+'__'+file['trackName']
 
+"""
+# uploading all clean data into bq
+file.to_csv("spotify_clean_history_data.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
+
+# uploading new version of csv to gcs
+blob = bucket.blob('spotify_clean_history_data.csv')
+blob.upload_from_filename('spotify_clean_history_data.csv')
+print("spotify full clean data file uploaded into Gcs")
+"""
+
 # creating unique song / artist df
 meta_df = file.drop(['endTime', 'msPlayed', 'clean duration'], axis=1)
 
@@ -89,9 +99,11 @@ sep("*", 100)
 # https://stmorse.github.io/journal/spotify-api.html
 # https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
 
-client_id = '00000000000000000000000'
-client_secret = '00000000000000000000000'
+blob = bucket.blob('spotify_credentials.json')
+key = json.loads(blob.download_as_string())
 
+client_id = key['client_id']
+client_secret = key['client_secret']
 
 def get_token():
     CLIENT_ID = client_id
@@ -227,19 +239,19 @@ def enrich_id_files():
         except:
             print('exception')
             # adding values to the list
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
-            item.append('None')
+            item.append(0)
+            item.append(0)
+            item.append('NaN')
+            item.append(0)
+            item.append(0)
+            item.append(0)
+            item.append(0)
+            item.append(0)
+            item.append(0)
+            item.append(0)
+            item.append(0)
+            item.append('NaN')
+            item.append(0)
 
         # unmute following line for qa purpose
         #print(f"song : {item[1]}, artist : {item[0]}, id : {id}, features : {features}")
@@ -249,7 +261,7 @@ def enrich_id_files():
     print(meta_list)
 
     with open('meta_song_ids.csv', 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+        writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
         header = ['artistName', 'trackName', 'text_key', 'trackId', 'danceability',
                           'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
                           'instrumentalness', 'liveness', 'valence', 'tempo', 'type', 'duration_ms']
