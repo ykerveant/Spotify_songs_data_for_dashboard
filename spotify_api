@@ -1,110 +1,26 @@
-from google.cloud import storage  # , bigquery
-import pandas as pd
-import datetime
-import requests
-import csv
-import json
 import os
+from google.cloud import storage  # , bigquery
+import requests
+import json
+import pandas as pd
+import csv
 
-# pandas display all rows
-pd.set_option("display.max_rows", 50, "display.max_columns", None)
-
-# credentials
-# google credentials
+#  -----------------------------------------------------------------------
+#  cloud storage
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "culture_key.json"
-
-# --------cloud storage--------
-# instantiate google cloud storage client & bucket specs
 storage_client = storage.Client()
 # define bucket
 bucket = storage_client.get_bucket('culture_data')
 
-
-def get_data_from_gcs(file):
-    blob = bucket.blob(file)
-    data = json.loads(blob.download_as_string())
-    return data
-
-
-def upload_to_gcs(blobname):
-    blob = bucket.blob(blobname)
-    blob.upload_from_filename(blobname)
-
-
-# --------data functions--------
-def sep(sep, time):
-    print(sep*time)
-
-
-def convert(n):
-    return str(datetime.timedelta(seconds=n))
-
-# --------crunch begin--------
-
-# downloading data
-blob = bucket.blob('MySpotifyData/StreamingHistory0.json')
-data0 = json.loads(blob.download_as_string())
-file0 = pd.DataFrame.from_records(data0)
-
-blob = bucket.blob('MySpotifyData/StreamingHistory1.json')
-data1 = json.loads(blob.download_as_string())
-file1 = pd.DataFrame.from_records(data1)
-
-blob = bucket.blob('MySpotifyData/StreamingHistory2.json')
-data2 = json.loads(blob.download_as_string())
-file2 = pd.DataFrame.from_records(data2)
-
-# crunching
-file = file0.append([file1, file2])
-
-# cleaning : adding key + converting song consumption
-file['clean duration'] = pd.to_datetime(file['msPlayed'], unit='ms')
-file['text_key'] = file['artistName']+'__'+file['trackName']
-
-"""
-# uploading all clean data into bq
-file.to_csv("spotify_clean_history_data.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
-
-# uploading new version of csv to gcs
-blob = bucket.blob('spotify_clean_history_data.csv')
-blob.upload_from_filename('spotify_clean_history_data.csv')
-print("spotify full clean data file uploaded into Gcs")
-"""
-
-# creating unique song / artist df
-meta_df = file.drop(['endTime', 'msPlayed', 'clean duration'], axis=1)
-
-print("meta df")
-print(meta_df.shape)
-print(type(meta_df))
-print(meta_df)
-
-
-# removing uniques
-meta_df.drop_duplicates(inplace=True)
-
-print("meta df--after")
-print(meta_df.shape)
-print(type(meta_df))
-print(meta_df)
-
-"""
-meta_list = meta_df.values.tolist()
-print("meta list")
-print(meta_list)
-"""
-#  -------------------> Spotify Api section <-------------------
-sep("*", 100)
-# doc
-# https://stmorse.github.io/journal/spotify-api.html
-# https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
-
+# get token
 blob = bucket.blob('spotify_credentials.json')
-key = json.loads(blob.download_as_string())
+spotify_key = json.loads(blob.download_as_string())
 
-client_id = key['client_id']
-client_secret = key['client_secret']
+client_id = spotify_key['client_id']
+client_secret = spotify_key['client_secret']
 
+#  -----------------------------------------------------------------------
+#  getting spotify api token
 def get_token():
     CLIENT_ID = client_id
     CLIENT_SECRET = client_secret
@@ -135,164 +51,150 @@ headers = {
 }
 
 
-def search_artist_id(artist):
-    search_endpoint = 'https://api.spotify.com/v1/search'
-    params = {'q': 'metallica', 'type': 'artist'}
-    search_data = requests.get(url=search_endpoint,
-                               params=params,
-                               headers=headers)
-    data = search_data.json()
-    print(data)
-    artist_name = data['artists']['items'][0]['name']
-    artist_id = data['artists']['items'][0]['id']
-    artist_genre = data['artists']['items'][0]['genres']
-    return artist_id
-
-
 def search_track_id(song, artist):
     try:
         search_endpoint = "https://api.spotify.com/v1/search"
-        query = f'track:{song} artist:{artist}'  # no need to encode query !
+        query = f"track:{song} artist:{artist}"  # no need to encode query !
         params = {'q': query, 'type': 'track'}
         search_id = requests.get(url=search_endpoint,
                                  params=params,
                                  headers=headers)
+
         data = search_id.json()
-        return data['tracks']['items'][0]['id']
+        print(data)
+        if data['tracks']['items'] == []: # --> if items is empty, rerun search with song only (not song+artist)
+            print("second seach with artist only")
+            search_endpoint = "https://api.spotify.com/v1/search"
+            second_query = f"{song}"
+            params = {'q': second_query, 'type': 'track'}
+            search_id = requests.get(url=search_endpoint,
+                                     params=params,
+                                     headers=headers)
+            data = search_id.json()
+            print(f"data before first result : {data}")
+            result = data['tracks']['items'][0]['id']
+            print(f'song only result (first if): {result}')
+            return result
+
+        elif not data['tracks']['items'] == []:
+            print(f"list not empty, looking for data['tracks']['items'][0]['id'] : {data}")
+            result = data['tracks']['items'][0]['id']
+            print(f'song and artist result: {result}')
+            return result
+
+        else:
+            result = data['tracks']['items'][0]['id']
+            print(f'song and artist result: {result}')
+            return result
 
     except(IndexError, KeyError):
-        return 'no data'
+            error_result = 'error'
+            return error_result
 
 
 def search_song_feature(song_id):
-    feature_endpoint = 'https://api.spotify.com/v1/audio-features/'
-    params = {'ids': song_id}
-    song_feature = requests.get(url=feature_endpoint,
-                                params=params,
-                                headers=headers)
-    #print(song_feature.url)
-    data = song_feature.json()
-    print(data)
-    if data == None:
-        data = 'None'
+    if song_id == 'no data':
+        data = 'NaN'
+    else:
+        feature_endpoint = 'https://api.spotify.com/v1/audio-features/'
+        params = {'ids': song_id}
+        song_feature = requests.get(url=feature_endpoint,
+                                    params=params,
+                                    headers=headers)
+        data = song_feature.json()
+        print(data)
     return data
 
-# ------------testing values------------
 
-trackid = search_track_id('one', 'metallica')
-print(trackid)
-sep("%", 100)
-feature = search_song_feature(search_track_id('one', 'metallica'))
-print(feature)
+#  data = search_song_feature('6drMFfp3JXylwgJNWaFhKv') # --> check if function is working.
+#  print(data)
 
-sep("%", 100)
-
-# tries to apply an api call per row ... doesn't seems to work.
-#print(f"meta_df['trackName'] : {meta_df['trackName'][0]}\n, meta_df['artistName'] : {meta_df['artistName'][0]}")
-#meta_df['songId'] = search_track_id(meta_df['trackName'].astype(str), meta_df['artistName'].astype(str))
-#print(search_track_id(meta_df['trackName'][0], meta_df['artistName'][0]))
-
-#-----------------adding meta data from spotify api---------------
-
-def enrich_id_files():
-    # converting dataframe into list of list
-    meta_list = meta_df.values.tolist()
-    print(meta_list)
-
-    counter = 0
-    for item in meta_list:
-        id = search_track_id(item[1], item[0])
-        item.append(id)
-        features = search_song_feature(item[3])  # --> extracting json from api
-        #print(features)
-
-        try:
-            # setting values
-            danceability = features['audio_features'][0]['danceability']
-            energy = features['audio_features'][0]['energy']
-            key = features['audio_features'][0]['key']
-            loudness = features['audio_features'][0]['loudness']
-            mode = features['audio_features'][0]['mode']
-            speechiness = features['audio_features'][0]['speechiness']
-            acousticness = features['audio_features'][0]['acousticness']
-            instrumentalness = features['audio_features'][0]['instrumentalness']
-            liveness = features['audio_features'][0]['liveness']
-            valence = features['audio_features'][0]['valence']
-            tempo = features['audio_features'][0]['tempo']
-            type = features['audio_features'][0]['type']
-            duration_ms = features['audio_features'][0]['duration_ms']
-
-            # adding values to the list
-            item.append(danceability)
-            item.append(energy)
-            item.append(key)
-            item.append(loudness)
-            item.append(mode)
-            item.append(speechiness)
-            item.append(acousticness)
-            item.append(instrumentalness)
-            item.append(liveness)
-            item.append(valence)
-            item.append(tempo)
-            item.append(type)
-            item.append(duration_ms)
-        except:
-            print('exception')
-            # adding values to the list
-            item.append(0)
-            item.append(0)
-            item.append('NaN')
-            item.append(0)
-            item.append(0)
-            item.append(0)
-            item.append(0)
-            item.append(0)
-            item.append(0)
-            item.append(0)
-            item.append(0)
-            item.append('NaN')
-            item.append(0)
-
-        # unmute following line for qa purpose
-        #print(f"song : {item[1]}, artist : {item[0]}, id : {id}, features : {features}")
-        counter += 1
-        print(f"{round((counter / 5004)*100, 4)}% done")
-
-    print(meta_list)
-
-    with open('meta_song_ids.csv', 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
-        header = ['artistName', 'trackName', 'text_key', 'trackId', 'danceability',
-                          'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
-                          'instrumentalness', 'liveness', 'valence', 'tempo', 'type', 'duration_ms']
-        writer.writerow(header)
-        writer.writerows(meta_list)
-
-    return meta_list
-
-
-enrich_id_files()
-
-# uploading new version of csv to gcs
-blob = bucket.blob('meta_song_ids.csv')
-blob.upload_from_filename('meta_song_ids.csv')
-print("file uploaded into Gcs")
-"""
-
-print(type(file))
-
-df = pd.read_csv('gs://bucket/your_path.csv')
-meta_data_df = pd.read_csv('gs://culture_data/meta_song_ids.csv')
-print(type(meta_data_df))
-
-
-blob = bucket.blob('meta_song_ids.csv')
-meta_data = json.loads(blob.download_as_string())
-print(type(meta_data))
-#meta_data_df = pd.DataFrame.(meta_data)
-
-# downloading data
+#  ------------------------------------------------------------------------
+#  data crunch begins
+#  downloading data from cloud storage
 blob = bucket.blob('MySpotifyData/StreamingHistory0.json')
 data0 = json.loads(blob.download_as_string())
 file0 = pd.DataFrame.from_records(data0)
-"""
+
+blob = bucket.blob('MySpotifyData/StreamingHistory1.json')
+data1 = json.loads(blob.download_as_string())
+file1 = pd.DataFrame.from_records(data1)
+
+blob = bucket.blob('MySpotifyData/StreamingHistory2.json')
+data2 = json.loads(blob.download_as_string())
+file2 = pd.DataFrame.from_records(data2)
+print("files downloaded")
+
+#  crunching
+file = file0.append([file1, file2])
+print("files merged")
+
+#  adding custom key
+file['text_key'] = file['artistName']+'__'+file['trackName']
+
+#  creating unique song / artist df
+#  cleaning
+meta_df = file.drop(['endTime', 'msPlayed'], axis=1)
+
+# checkup
+print("meta df")
+print(meta_df.shape)
+print(type(meta_df))
+
+#  removing uniques
+meta_df.drop_duplicates(inplace=True)
+print("unique song file created")
+
+# checkup after drop duplicates
+print("meta df--after")
+print(meta_df.shape)
+print(type(meta_df))
+
+# converting dataframe into list of list
+list_of_songs = meta_df.values.tolist()
+print(list_of_songs)
+
+#  file = pd.read_csv("no_id_tracks.csv")
+#  list_of_songs = file.values.tolist()
+
+counter = 0
+for item in list_of_songs:
+    print("#"*100)
+    #  for each song, search for features
+    print(item)
+    print(search_track_id(item[1], item[0]))
+    result = search_song_feature(search_track_id(item[1], item[0]))
+
+    #  for each feature, append it to song
+    list_of_features_to_append = ["id", "danceability", "energy", "key", "loudness",
+                                  "mode", "speechiness", "acousticness", "instrumentalness",
+                                  "liveness", "valence", "tempo", "type", "duration_ms"]
+    for feature in list_of_features_to_append:
+        try:
+            item.append(result['audio_features'][0][feature])
+        except(TypeError, KeyError):
+            # looking for right id again
+            new_result = {'audio_features': [{'danceability': 0, 'energy': 0, 'key': 0, 'loudness': 0, 'mode': 0, 'speechiness': 0, 'acousticness': 0, 'instrumentalness': 0, 'liveness': 0, 'valence': 0, 'tempo': 0, 'type': 'audio_features', 'id': 'no-id', 'uri': 'spotify:track:no-id', 'track_href': 'https://api.spotify.com/v1/tracks/no-id', 'analysis_url': 'https://api.spotify.com/v1/audio-analysis/no-id', 'duration_ms': 0, 'time_signature': 0}]}
+            item.append(new_result['audio_features'][0][feature])
+            print('exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
+            print(new_result)
+
+
+    #  counter
+    counter += 1
+    print(f"{round((counter / 5004)*100, 4)}% done")
+
+
+with open('enriched_songs.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+    header = ['artistName', 'trackName', 'text_key', 'trackId', 'danceability',
+              'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
+              'instrumentalness', 'liveness', 'valence', 'tempo', 'type', 'duration_ms']
+    writer.writerow(header)
+    writer.writerows(list_of_songs)
+
+
+# uploading new version of csv to gcs
+blob = bucket.blob('enriched_songs.csv')
+blob.upload_from_filename('enriched_songs.csv')
+print("file uploaded into Gcs")
