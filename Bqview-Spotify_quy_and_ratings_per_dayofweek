@@ -1,0 +1,44 @@
+SELECT
+EXTRACT(DAYOFWEEK FROM date) AS day_of_week_nb,
+CASE
+WHEN EXTRACT(DAYOFWEEK FROM date) = 1 THEN "DIMANCHE"
+WHEN EXTRACT(DAYOFWEEK FROM date) = 2 THEN "LUNDI"
+WHEN EXTRACT(DAYOFWEEK FROM date) = 3 THEN "MARDI"
+WHEN EXTRACT(DAYOFWEEK FROM date) = 4 THEN "MERCREDI"
+WHEN EXTRACT(DAYOFWEEK FROM date) = 5 THEN "JEUDI"
+WHEN EXTRACT(DAYOFWEEK FROM date) = 6 THEN "VENDREDI"
+WHEN EXTRACT(DAYOFWEEK FROM date) = 7 THEN "SAMEDI"
+END as day_of_week_text,
+AVG(daily_seconds_played) as daily_seconds_played, #  --> division for vizualisation datastudio
+AVG(danceability) as danceability,
+AVG(energy) as energy,
+AVG(key) as key,
+AVG(loudness) as loudness,
+AVG(speechiness) as speechiness,
+AVG(acousticness) as acousticnesss,
+AVG(instrumentalness) as instrumentalness,
+AVG(liveness) as liveness,
+AVG(valence) as valence,
+AVG(tempo) as tempo
+FROM 
+  (
+  SELECT
+  DATE(EXTRACT(YEAR FROM startTime), EXTRACT(MONTH FROM startTime), EXTRACT(DAY FROM startTime)) AS date,
+  SUM(msPlayed / 1000) as daily_seconds_played, 
+  AVG(danceability) as danceability,
+  AVG(energy) as energy,
+  AVG(key) as key,
+  AVG(loudness) as loudness,
+  AVG(speechiness) as speechiness,
+  AVG(acousticness) as acousticness,
+  AVG(instrumentalness) as instrumentalness,
+  AVG(liveness) as liveness,
+  AVG(valence) as valence,
+  AVG(tempo) as tempo
+  FROM
+  `main-248612.culture.spotify_complete_dataset`
+  GROUP BY 1
+  order by 1
+  )
+group by 1,2
+order by 1 asc
