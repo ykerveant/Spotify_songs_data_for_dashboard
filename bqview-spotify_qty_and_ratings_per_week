@@ -1,0 +1,33 @@
+SELECT
+first_day_of_week,
+isoWeek,
+AVG(total_seconds_played) as total_seconds_played, #  --> division for vizualisation datastudio
+AVG(danceability) as danceability,
+AVG(energy) as energy,
+AVG(key) as key,
+AVG(loudness) as loudness,
+AVG(speechiness) as speechiness,
+AVG(acousticnesss) as acousticnesss,
+AVG(instrumentalness) as instrumentalness,
+AVG(liveness) as liveness,
+AVG(valence) as valence,
+AVG(tempo) as tempo
+FROM 
+  (select 
+  DATE_TRUNC(date(endTime), ISOWEEK) as first_day_of_week,
+  extract(ISOWEEK from endTime) as isoWeek,
+  sum(msPlayed/1000) as total_seconds_played, #  --> division for vizualisation datastudio
+  AVG(danceability) as danceability,
+  AVG(energy) as energy,
+  AVG(key) as key,
+  AVG(loudness) as loudness,
+  AVG(speechiness) as speechiness,
+  AVG(acousticness) as acousticnesss,
+  AVG(instrumentalness) as instrumentalness,
+  AVG(liveness) as liveness,
+  AVG(valence) as valence,
+  AVG(tempo) as tempo
+  from `main-248612.culture.spotify_complete_dataset`
+  group by 1,2)
+group by 1, 2
+order by 1 asc
