@@ -124,18 +124,19 @@ In the name of Google Cloud Storage, python and big query,
 AMEN.
 
 # Big Query structure
-|type | table / view name | data type |
-|table | netflix_consumptionbyshow | crunched data|
-|table | netflix_consumptionByShowAndDate | crunched data|
-|table | netflix_consumptionbytime | crunched data|
-|table | netflix_viewingActivity | raw data|
-|table | spotify_albums | raw data|
-|view | spotify_complete_dataset | raw data|
-|view | spotify_consumption_per_hour_of_day | crunched data|
-|view | spotify_consumption_per_hour_of_day_nokids | crunched data|
-|table | spotify_full_data | raw data|
-|table | spotify_meta | raw data|
-|table | spotify_playlist | raw data|
-|view | spotify_qty_and_ratings_per_day | crunched data|
-|view | spotify_qty_and_ratings_per_week | crunched data|
-|view | Spotify_quy_and_ratings_per_dayofweek | crunched data|
+|type  | table / view name                          | data type           |
+|----- |--------------------------------------------|---------------------|
+|table | netflix_consumptionbyshow                  | crunched data       |
+|table | netflix_consumptionByShowAndDate           | crunched data       |
+|table | netflix_consumptionbytime                  | crunched data       |
+|table | netflix_viewingActivity                    | raw data            |
+|table | spotify_albums                             | raw data            |
+|view  | spotify_complete_dataset                   | raw data            |
+|view  | spotify_consumption_per_hour_of_day        | crunched data       |
+|view  | spotify_consumption_per_hour_of_day_nokids | crunched data       |
+|table | spotify_full_data                          | raw data            |
+|table | spotify_meta                               | raw data            |
+|table | spotify_playlist                           | raw data            |
+|view  | spotify_qty_and_ratings_per_day            | crunched data       |
+|view  | spotify_qty_and_ratings_per_week           | crunched data       |
+|view  | Spotify_quy_and_ratings_per_dayofweek      | crunched data       |
