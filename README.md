@@ -2,9 +2,10 @@
 
 
 ## goal : visualisze my spotify data in a dashboard.
-Data comes from the personal report available in the platform. 
-ETL with python. 
-Storage via Google Cloud Storage and Big Query.
+Data comes from the personal report available in the platform.  
+ETL with python.  
+Storage via Google Cloud Storage and Big Query.  
+[Dashboard link](https://datastudio.google.com/s/vwVPoXiG1iY)
 
 ## Setup steps
 - setup :
