@@ -1,10 +1,10 @@
 # song_and_movies_analysis
 
 ## Table of contents
-    https://github.com/ykerveant/song_and_movies_analysis#setup-steps
-    https://github.com/ykerveant/song_and_movies_analysis#data-description
-    https://github.com/ykerveant/song_and_movies_analysis#etl-steps----extract-enrich-and-store-the-data
-    https://github.com/ykerveant/song_and_movies_analysis#big-query-structure
+[setup steps](https://github.com/ykerveant/song_and_movies_analysis#setup-steps)
+[data description](https://github.com/ykerveant/song_and_movies_analysis#data-description)
+[enrich and store data](https://github.com/ykerveant/song_and_movies_analysis#etl-steps----extract-enrich-and-store-the-data)
+[Big Query Structure](https://github.com/ykerveant/song_and_movies_analysis#big-query-structure)
 
 ## goal : visualisze my spotify data in a dashboard.
 Data comes from the personal report available in the platform.  
