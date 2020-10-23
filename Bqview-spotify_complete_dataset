@@ -1,0 +1,30 @@
+SELECT
+  f.artistName,
+  f.trackName,
+  p.playlist,
+  p.albumName,
+  f.endTime,
+  DATETIME_SUB(datetime(f.endTime), INTERVAL f.msPlayed MILLISECOND) as startTime,
+  f.text_key,
+  f.msPlayed,
+  m.danceability,
+  m.energy,
+  m.key,
+  m.loudness,
+  m.speechiness,
+  m.acousticness,
+  m.instrumentalness,
+  m.liveness,
+  m.valence,
+  m.tempo,
+  m.duration_ms
+FROM
+  `main-248612.culture.spotify_full_data` f
+LEFT JOIN
+  (select * from `main-248612.culture.spotify_meta` where trackId not like "no-id") m
+ON
+  f.text_key = m.text_key
+LEFT JOIN
+  `main-248612.culture.spotify_playlist` p
+ON
+  f.text_key = concat(p.artistName, "__", p.trackName)
