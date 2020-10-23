@@ -5,7 +5,7 @@
 Data comes from the personal report available in the platform.  
 ETL with python.  
 Storage via Google Cloud Storage and Big Query.  
-[Dashboard link](https://datastudio.google.com/s/vwVPoXiG1iY)
+[Dashboard  has been done with Google Data Studio.](https://datastudio.google.com/s/vwVPoXiG1iY)
 
 ## Setup steps
 - setup :
