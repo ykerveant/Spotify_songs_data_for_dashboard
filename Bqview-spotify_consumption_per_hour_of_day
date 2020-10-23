@@ -1,0 +1,33 @@
+SELECT
+    hour_of_day,
+    AVG(hourly_seconds_played) as hourly_seconds_played,
+    AVG(danceability) AS danceability,
+    AVG(energy) AS energy,
+    AVG(key) AS key,
+    AVG(loudness) AS loudness,
+    AVG(speechiness) AS speechiness,
+    AVG(acousticness) AS acousticness,
+    AVG(instrumentalness) AS instrumentalness,
+    AVG(liveness) AS liveness,
+    AVG(valence) AS valence,
+    AVG(tempo) AS tempo
+FROM (
+    SELECT EXTRACT(HOUR FROM startTime) AS hour_of_day,
+    DATE(EXTRACT(YEAR FROM startTime), EXTRACT(MONTH FROM startTime), EXTRACT(DAY FROM startTime)) AS date,
+    SUM(msPlayed / 1000) AS hourly_seconds_played,
+    AVG(danceability) AS danceability,
+    AVG(energy) AS energy,
+    AVG(key) AS key,
+    AVG(loudness) AS loudness,
+    AVG(speechiness) AS speechiness,
+    AVG(acousticness) AS acousticness,
+    AVG(instrumentalness) AS instrumentalness,
+    AVG(liveness) AS liveness,
+    AVG(valence) AS valence,
+    AVG(tempo) AS tempo
+  FROM
+    `main-248612.culture.spotify_complete_dataset`
+  GROUP BY
+    1,2
+    )
+    GROUP BY 1
