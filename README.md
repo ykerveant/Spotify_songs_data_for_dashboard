@@ -1,5 +1,10 @@
 # song_and_movies_analysis
 
+## Table of contents
+    https://github.com/ykerveant/song_and_movies_analysis#setup-steps
+    https://github.com/ykerveant/song_and_movies_analysis#data-description
+    https://github.com/ykerveant/song_and_movies_analysis#etl-steps----extract-enrich-and-store-the-data
+    https://github.com/ykerveant/song_and_movies_analysis#big-query-structure
 
 ## goal : visualisze my spotify data in a dashboard.
 Data comes from the personal report available in the platform.  
@@ -123,6 +128,10 @@ In the name of Google Cloud Storage, python and big query,
 AMEN.
 
 # Big Query structure
+
+All results are stored in Big Query and visualized in [this data studio dashboard](https://datastudio.google.com/s/vwVPoXiG1iY).  
+The data types are the following : raw data, crunched data and cleaned data (master table).
+
 |type  | table / view name                          | data type           |
 |----- |--------------------------------------------|---------------------|
 |table | netflix_consumptionbyshow                  | crunched data       |
@@ -133,7 +142,7 @@ AMEN.
 |view  | spotify_complete_dataset                   | raw data            |
 |view  | spotify_consumption_per_hour_of_day        | crunched data       |
 |view  | spotify_consumption_per_hour_of_day_nokids | crunched data       |
-|table | spotify_full_data                          | raw data            |
+|table | spotify_full_data                          | cleaned data        |
 |table | spotify_meta                               | raw data            |
 |table | spotify_playlist                           | raw data            |
 |view  | spotify_qty_and_ratings_per_day            | crunched data       |
