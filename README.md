@@ -101,23 +101,23 @@ In order to maximize performance, instead of looping over every song, create a l
 All doc is available via [this link](https://developer.spotify.com/documentation/general/guides/authorization-guide/).
 
 ### Enrich data : 
-Looping over every song in the distinct list of song
-Add to each song the song features available through [the song feature api](https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/).
-This api need the song id for each song, wich is not enclosed in the data. I have to search it.
+Looping over every song in the distinct list of song.  
+Add to each song the song features available through [the song feature api](https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/).  
+This api need the song id for each song, wich is not enclosed in the data. I have to search it.  
 
 ### Find the Id with the song name and artist.
-Perform a search with song and name. An array of json results is returned, with the id inside.
+Perform a search with song and name. An array of json results is returned, with the id inside.  
 
 ### Handling exceptions.
-Sometimes, the id returned does not work. A second search is then needed to return a second id. And so on.
+Sometimes, the id returned does not work. A second search is then needed to return a second id. And so on.  
 
 ### Getting the feature data for each song
-Calling the api with the id.
-Storing the feature result into a csv next to song name, artist and id.
+Calling the api with the id.  
+Storing the feature result into a csv next to song name, artist and id.  
 
 ### Saving the csv
-Once the loop fully done, export data into  a csv.
-Then send the csv into cloud storage.
+Once the loop fully done, export data into  a csv.  
+Then send the csv into cloud storage.  
 
-In the name of Google Cloud Storage, python and big query, 
+In the name of Google Cloud Storage, python and big query,  
 AMEN.
