@@ -15,17 +15,17 @@ Storage via Google Cloud Storage and Big Query.
 ## Data description
 All files are in json format
 List of files :  
-  Follow.json  
-  Inferences.json  
-  Payments.json  
-  Playlist1.json  
-  Read_Me_First.pdf  
-  SearchQueries.json  
-  StreamingHistory0.json  
-  StreamingHistory1.json  
-  StreamingHistory2.json  
-  Userdata.json  
-  YourLibrary.json  
+**Follow.json  
+**Inferences.json  
+**Payments.json  
+**Playlist1.json  
+**Read_Me_First.pdf  
+**SearchQueries.json  
+**StreamingHistory0.json  
+**StreamingHistory1.json  
+**StreamingHistory2.json  
+**Userdata.json  
+**YourLibrary.json  
 
 ### yourlibrary.json : --> songs stored into your library
 ```
