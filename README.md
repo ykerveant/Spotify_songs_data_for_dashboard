@@ -5,10 +5,9 @@
 Data comes from the personal report available in the platform.  
 ETL with python.  
 Storage via Google Cloud Storage and Big Query.  
-[Dashboard  has been done with Google Data Studio.](https://datastudio.google.com/s/vwVPoXiG1iY)
+Dashboard  has been done with Google Data Studio. [Link here](https://datastudio.google.com/s/vwVPoXiG1iY).
 
 ## Setup steps
-- setup :
   - [Download personal data from from spotify](https://support.spotify.com/us/article/data-rights-and-privacy-settings/)
   - Create an app within developers.spotify.com to get a service account (key & client secret)
 
@@ -27,7 +26,7 @@ List of files :
 -Userdata.json  
 -YourLibrary.json  
 
-### yourlibrary.json : --> songs stored into your library
+### yourlibrary.json --> songs stored into your library
 ```
 {  
  "tracks": [  
@@ -66,7 +65,7 @@ List of files :
 "other": [  ]
 }
 ```
-### Streaming history files : --> songs listened.
+### Streaming history files --> songs listened
 ```
 [
  {
@@ -90,7 +89,7 @@ List of files :
 ]
 ```
 
-## Etl steps: --> extract, enrich and store the data.
+## Etl steps --> extract, enrich and store the data
 
 ### Merge listening files together.
 In order to work with one file.
