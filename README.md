@@ -25,18 +25,19 @@ data description:
 streaminghistory.json example :
 
 yourlibrary.json :
-{
- "tracks": [
-    {
-      "artist": "Green Day",
-      "album": "Nimrod",
-      "track": "All the Time"
-    }, 
-    {
-      "artist": "Paul McCartney",
-      "album": "Egypt Station",
-      "track": "Confidante"
-    }],
+```
+{  
+ "tracks": [  
+    {  
+      "artist": "Green Day",  
+      "album": "Nimrod",  
+      "track": "All the Time"  
+    },   
+    {  
+      "artist": "Paul McCartney",  
+      "album": "Egypt Station",  
+      "track": "Confidante"  
+    }],  
 
 "albums": [
     {
@@ -61,6 +62,6 @@ yourlibrary.json :
 "bannedTracks": [  ],
 "other": [  ]
 }
-
+```
 
 enrich the data : merge file, connect to api. In the name of Google Cloud Storage python and big query, AMEN.
