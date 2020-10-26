@@ -1,0 +1,41 @@
+import json
+import csv
+import os
+from google.cloud import storage
+import pandas as pd
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "culture_key.json"
+storage_client = storage.Client()
+# define bucket
+bucket = storage_client.get_bucket('culture_data')
+
+with open("MySpotifyData/Playlist1.json", 'r', encoding='utf-8') as file:
+    data = json.load(file)
+
+print(data['playlists'])
+
+#  unnesting json data with double look (playlist / track)
+list_of_tracks_with_playlist = []
+
+for playlist in data['playlists']:
+    print(playlist)
+    playlistName = playlist['name']
+    for track in playlist['items']:
+        track_caracteristics = []
+        track_caracteristics.append(track['track']['trackName'])
+        track_caracteristics.append(track['track']['artistName'])
+        track_caracteristics.append(track['track']['albumName'])
+        track_caracteristics.append(playlist['name'])
+        list_of_tracks_with_playlist.append(track_caracteristics)
+
+print(list_of_tracks_with_playlist)
+
+
+with open('playlists.csv', 'w', newline='', encoding='utf-8') as output_file:
+    writer = csv.writer(output_file, quoting=csv.QUOTE_NONNUMERIC)
+    header = ['trackName', 'artistName', 'albumName', 'playlist']
+    writer.writerow(header)
+    writer.writerows(list_of_tracks_with_playlist)
+
+blob = bucket.blob('playlists.csv')
+blob.upload_from_filename('playlists.csv')
