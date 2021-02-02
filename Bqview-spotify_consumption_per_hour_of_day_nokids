@@ -26,8 +26,8 @@ FROM (
     AVG(valence) AS valence,
     AVG(tempo) AS tempo
   FROM
-    `main-248612.culture.spotify_complete_dataset`
-  WHERE playlist not like "Brahms’ Lullaby"
+    `project.dataset.spotify_complete_dataset`
+  WHERE playlist not like "Brahms’ Lullaby" --> incomplete part
   GROUP BY
     1,2
     )
