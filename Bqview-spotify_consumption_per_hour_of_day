@@ -26,7 +26,7 @@ FROM (
     AVG(valence) AS valence,
     AVG(tempo) AS tempo
   FROM
-    `main-248612.culture.spotify_complete_dataset`
+    `project.dataset.spotify_complete_dataset`
   GROUP BY
     1,2
     )
