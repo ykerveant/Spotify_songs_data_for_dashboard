@@ -19,12 +19,12 @@ SELECT
   m.tempo,
   m.duration_ms
 FROM
-  `main-248612.culture.spotify_full_data` f
+  `project.dataset.spotify_full_data` f
 LEFT JOIN
-  (select * from `main-248612.culture.spotify_meta` where trackId not like "no-id") m
+  (select * from `project.dataset.spotify_meta` where trackId not like "no-id") m
 ON
   f.text_key = m.text_key
 LEFT JOIN
-  `main-248612.culture.spotify_playlist` p
+  `project.dataset.spotify_playlist` p
 ON
   f.text_key = concat(p.artistName, "__", p.trackName)
