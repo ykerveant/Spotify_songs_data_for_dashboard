@@ -11,7 +11,7 @@
 Data comes from the personal report available in the platform.  
 ETL with python.  
 Storage via Google Cloud Storage and Big Query.  
-Dashboard  has been done with Google Data Studio. [Link here](https://datastudio.google.com/s/vwVPoXiG1iY).
+Dashboard  has been done with Google Data Studio. [Link here](https://datastudio.google.com/reporting/0d633024-0a2b-4cd0-b87d-02e9ee749f68).
 
 ## Setup steps
   - [Download personal data from from spotify](https://support.spotify.com/us/article/data-rights-and-privacy-settings/)
