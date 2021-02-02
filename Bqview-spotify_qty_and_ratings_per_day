@@ -27,6 +27,6 @@ AVG(instrumentalness) as instrumentalness,
 AVG(liveness) as liveness,
 AVG(valence) as valence,
 AVG(tempo) as tempo
-from `main-248612.culture.spotify_complete_dataset`
+from `project.dataset.spotify_complete_dataset`
 group by 1
 order by 1 asc)
