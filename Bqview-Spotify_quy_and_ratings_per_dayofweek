@@ -35,7 +35,7 @@ FROM
     AVG(liveness) as liveness,
     AVG(valence) as valence,
     AVG(tempo) as tempo
-  FROM `main-248612.culture.spotify_complete_dataset`
+  FROM `project.dataset.spotify_complete_dataset`
   GROUP BY 1
   ORDER BY 1
   )
