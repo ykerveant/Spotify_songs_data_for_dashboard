@@ -1,0 +1,11 @@
+CREATE OR REPLACE TABLE culture.netflix_consumptionByShowAndDate AS
+
+SELECT
+CONCAT(EXTRACT(YEAR from Start_Time),FORMAT("%02d", EXTRACT(MONTH from Start_Time))) as month_of_year,
+split(title, ':')[SAFE_OFFSET(0)] as title,
+SUM(CAST(REGEXP_EXTRACT(cast(duration as string), "^([0-9]{2})") as INT64) * 3600
++ CAST(REPLACE(REGEXP_EXTRACT(cast(duration as string), ":[0-9]{2}:"),":", "") as INT64) * 60
++ CAST(REGEXP_EXTRACT(cast(duration as string), r"([0-9]{2}$)") as INT64)) as total_duration,
+FROM `main-248612.culture.netflix_viewingActivity`
+group by 1,2
+order by 2 desc
