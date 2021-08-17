@@ -1,0 +1,12 @@
+CREATE OR REPLACE TABLE culture.netflix_consumptionbytime AS
+
+SELECT
+EXTRACT(DATE from Start_Time) as date,
+format("%02d", EXTRACT(MONTH from Start_Time)) as month,
+EXTRACT(YEAR from Start_Time) as year,
+CONCAT(EXTRACT(YEAR from Start_Time),EXTRACT(MONTH from Start_Time)) as month_of_year,
+#split(title, ':')[SAFE_OFFSET(0)] as title,
+SUM(EXTRACT(SECOND from duration)) as total_duration,
+FROM `main-248612.culture.netflix_viewingActivity`
+group by 1,2,3,4
+order by 1 asc
